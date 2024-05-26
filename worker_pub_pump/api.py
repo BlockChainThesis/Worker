@@ -114,6 +114,7 @@ def get_controller_value_api():
     station_id = request.args.get('station_id')
     controller_id = request.args.get('controller_id')
     data = station_data[station_id]
+    # print(data)
     sensor_value = None
     for sensor in data['sensors']:
         if sensor['sensor_id'] == controller_id:
