@@ -101,15 +101,27 @@ def turn_off():
 
     return jsonify({"error": f"Sensor {sensor_id} not found for station {station_id}"}), 404
 
+# @app.route('/get_controller_value', methods=['GET'])
+# def get_controller_value_api():
+#     station_id = request.args.get('station_id')
+#     controller_id = request.args.get('controller_id')
+#     value = get_controller_value(station_id, controller_id)
+#     return jsonify({"controller_value": value}), 200
+
+
 @app.route('/get_controller_value', methods=['GET'])
 def get_controller_value_api():
     station_id = request.args.get('station_id')
     controller_id = request.args.get('controller_id')
-    value = get_controller_value(station_id, controller_id)
-    return jsonify({"controller_value": value}), 200
+    data = station_data[station_id]
+    sensor_value = None
+    for sensor in data['sensors']:
+        if sensor['sensor_id'] == controller_id:
+            sensor_value = sensor['sensor_value']
+            return jsonify({"controller_value": sensor_value})
+    # print(sensor_value)
+    return jsonify({"error": f"No value found for station_id: {station_id} and controller_id: {controller_id}"}), 404
 
-
-print(publish_data(1))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5006)
