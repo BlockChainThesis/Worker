@@ -6,8 +6,8 @@ MQTT_SERVER = "mqttserver.tk"
 MQTT_PORT = 1883
 MQTT_USERNAME = "innovation"
 MQTT_PASSWORD = "Innovation_RgPQAZoA5N"
-MQTT_TOPIC_PUB = "/innovation/valvecontroller/topic1"
-MQTT_TOPIC_SUB = "/innovation/valvecontroller/topic1"
+MQTT_TOPIC_PUB = "/innovation/valvecontroller/station"
+MQTT_TOPIC_SUB = "/innovation/valvecontroller/station"
 
 def mqtt_connected(client, userdata, flags, rc):
     print("Connected successfully!!")

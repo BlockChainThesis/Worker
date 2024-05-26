@@ -1,0 +1,264 @@
+{
+    "contract_address" : "0x057E43478bB3F5892F54a630AB71Cf61a765Fad5",
+    "contract_abi" : 
+    [
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "string",
+            "name": "_stationId",
+            "type": "string"
+          },
+          {
+            "indexed": false,
+            "internalType": "string",
+            "name": "_controllerId",
+            "type": "string"
+          },
+          {
+            "indexed": false,
+            "internalType": "string",
+            "name": "_controllerValue",
+            "type": "string"
+          }
+        ],
+        "name": "ControllerDataUpdated",
+        "type": "event"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "_stationId",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "_controllerId",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "_controllerValue",
+            "type": "string"
+          }
+        ],
+        "name": "addController",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "name": "currentControllers",
+        "outputs": [
+          {
+            "internalType": "string",
+            "name": "stationId",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "controllerId",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "createAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "controllerValue",
+            "type": "string"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getAllController",
+        "outputs": [
+          {
+            "components": [
+              {
+                "internalType": "string",
+                "name": "stationId",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "controllerId",
+                "type": "string"
+              },
+              {
+                "internalType": "uint256",
+                "name": "createAt",
+                "type": "uint256"
+              },
+              {
+                "internalType": "string",
+                "name": "controllerValue",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct ControllerContract.ControllerData[]",
+            "name": "",
+            "type": "tuple[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "_stationId",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "_controllerId",
+            "type": "string"
+          }
+        ],
+        "name": "getControllerValue",
+        "outputs": [
+          {
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "_length",
+            "type": "uint256"
+          }
+        ],
+        "name": "getHistoryController",
+        "outputs": [
+          {
+            "components": [
+              {
+                "internalType": "string",
+                "name": "stationId",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "controllerId",
+                "type": "string"
+              },
+              {
+                "internalType": "uint256",
+                "name": "createAt",
+                "type": "uint256"
+              },
+              {
+                "internalType": "string",
+                "name": "controllerValue",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct ControllerContract.ControllerData[]",
+            "name": "",
+            "type": "tuple[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "name": "historyData",
+        "outputs": [
+          {
+            "internalType": "string",
+            "name": "stationId",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "controllerId",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "createAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "controllerValue",
+            "type": "string"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "historyLength",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "_stationId",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "_controllerId",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "_controllerValue",
+            "type": "string"
+          }
+        ],
+        "name": "updateControllerValue",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ]
+}

@@ -8,7 +8,6 @@ MQTT_PORT = 1883
 MQTT_USERNAME = "innovation"
 MQTT_PASSWORD = "Innovation_RgPQAZoA5N"
 MQTT_TOPIC_SUB = "/innovation/valvecontroller/station"
-
 station_data = {}
 
 def mqtt_connected(client, userdata, flags, rc):

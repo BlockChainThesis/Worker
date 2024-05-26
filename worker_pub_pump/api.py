@@ -3,10 +3,9 @@ import time
 import json
 from flask import Flask, request, jsonify
 from function import setup_mqtt_client, station_data
-from interact_blockchain import get_station_data, add_stations_data, get_number_of_station, get_controller_value
+from interact_blockchain import update_controller_data, get_controller_value
 
-
-MQTT_TOPIC_PUB = "/innovation/valvecontroller/topic1"
+MQTT_TOPIC_PUB = "/innovation/pumpcontroller/station"
 mqttClient = setup_mqtt_client()
 mqttClient.loop_start()
 
@@ -17,18 +16,48 @@ def publish_data(station_id):
         return {"error": f"No data available for station_id: {station_id}"}
 
     data = station_data[station_id]
+    # data = {
+    #     "station_id": "PUMP_0001",
+    #     "station_name": "He Thong Bom",
+    #     "gps_longitude": 106.89,
+    #     "gps_latitude": 10.5,
+    #     "sensors": [
+    #         {
+    #         "sensor_id": "pump_0001",
+    #         "sensor_name": "Phan khu 1",
+    #         "sensor_value": 0,
+    #         "sensor_unit": ""
+    #         },
+    #         {
+    #         "sensor_id": "pump_0002",
+    #         "sensor_name": "Phan khu 2",
+    #         "sensor_value": 0,
+    #         "sensor_unit": ""
+    #         },
+    #         {
+    #         "sensor_id": "pump_0003",
+    #         "sensor_name": "Phan khu 3",
+    #         "sensor_value": 0,
+    #         "sensor_unit": ""
+    #         },
+    #         {
+    #         "sensor_id": "pump_0004",
+    #         "sensor_name": "Phan khu 4",
+    #         "sensor_value": 0,
+    #         "sensor_unit": ""
+    #         },
+    #         {
+    #         "sensor_id": "pump_0005",
+    #         "sensor_name": "Phan khu 5",
+    #         "sensor_value": 0,
+    #         "sensor_unit": ""
+    #         }
+    #     ]
+    # }
+    
     json_data = json.dumps(data)
+    print(json_data)
     mqttClient.publish(MQTT_TOPIC_PUB, json_data, retain=True)
-    # add data to blockchain
-    sensorIds = [] 
-    sensorValues = []
-    sensorUinits = []
-    for sensor in data["sensors"]:
-        sensorIds.append(sensor["sensor_id"])
-        sensorValues.append(str(sensor["sensor_value"]))
-        sensorUinits.append(sensor["sensor_unit"])
-    receipt = add_stations_data(data["station_id"], data["gps_longitude"], data["gps_latitude"], sensorIds, sensorValues, sensorUinits)
-    print("Transaction receipt:", receipt)
 
     return {"success": True, "message": f"Data published for station_id: {station_id}"}
 
@@ -46,6 +75,8 @@ def turn_on():
         if sensor['sensor_id'] == sensor_id:
             sensor['sensor_value'] = 1  # Turn on the sensor (example value)
             result = publish_data(station_id)
+            # add data to blockchain
+            # update_controller_data(station_id, sensor_id, 1)
             return jsonify(result), 200
 
     return jsonify({"error": f"Sensor {sensor_id} not found for station {station_id}"}), 404
@@ -64,26 +95,11 @@ def turn_off():
         if sensor['sensor_id'] == sensor_id:
             sensor['sensor_value'] = 0  # Turn off the sensor (example value)
             result = publish_data(station_id)
+            # add data to blockchain
+            # receipt = update_controller_data(station_id, sensor_id, 0)
             return jsonify(result), 200
 
     return jsonify({"error": f"Sensor {sensor_id} not found for station {station_id}"}), 404
-
-@app.route('/get_station_data', methods=['GET'])
-def get_station_data_api():
-    station_id = request.args.get('station_id')
-    if not station_id:
-        return jsonify({"error": "station_id is required"}), 400
-
-    data = get_station_data(station_id)
-    if not data:
-        return jsonify({"error": f"No data available for station_id: {station_id}"}), 404
-
-    return jsonify(data), 200
-
-@app.route('/get_number_of_station', methods=['GET'])
-def get_number_of_station_api():
-    count = get_number_of_station()
-    return jsonify({"number_of_station": count}), 200
 
 @app.route('/get_controller_value', methods=['GET'])
 def get_controller_value_api():
@@ -92,5 +108,10 @@ def get_controller_value_api():
     value = get_controller_value(station_id, controller_id)
     return jsonify({"controller_value": value}), 200
 
+
+print(publish_data(1))
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5005)
+    app.run(host='0.0.0.0', port=5006)
+
+# print(publish_data(1))
