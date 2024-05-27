@@ -4,14 +4,14 @@ import json
 from flask import Flask, request, jsonify
 from function import setup_mqtt_client, station_data
 from interact_blockchain import update_controller_data, get_controller_value
-
+from flask_cors import CORS
 
 MQTT_TOPIC_PUB = "/innovation/valvecontroller/station"
 mqttClient = setup_mqtt_client()
 mqttClient.loop_start()
 
 app = Flask(__name__)
-
+CORS(app)
 def publish_data(station_id):
     if station_id not in station_data:
         return {"error": f"No data available for station_id: {station_id}"}
