@@ -8,7 +8,7 @@ MQTT_SERVER = "mqttserver.tk"
 MQTT_PORT = 1883
 MQTT_USERNAME = "innovation"
 MQTT_PASSWORD = "Innovation_RgPQAZoA5N"
-MQTT_TOPICS_SUB = ["/innovation/watermonitoring/topic1", "/innovation/watermonitoring/topic2"]  # Add your topics here
+MQTT_TOPICS_SUB = ["/innovation/airmonitoring/NBIOTs"]  # Add your topics here
 
 def mqtt_connected(client, userdata, flags, rc):
     print(f"Connected successfully to {userdata['topic']}!")
@@ -27,13 +27,17 @@ def mqtt_recv_message(client, userdata, message):
         sensorValues = []
         sensorUinits = []
         for sensor in data["sensors"]:
-            sensorIds.append(sensor["sensor_id"])
-            sensorValues.append(str(sensor["sensor_value"]))
-            sensorUinits.append(sensor["sensor_unit"])
-            print(sensor["sensor_id"], " ", sensor["sensor_value"], " ", sensor["sensor_unit"])
+            sensor_id = sensor["id"]
+            if "Relay" in sensor_id:
+                continue  # Skip Relay sensors
+            sensorIds.append(sensor["id"])
+            sensorValues.append(str(sensor["value"]))
+            # sensorUinits.append(sensor["sensor_unit"])
+            sensorUinits.append("")
+            print(sensor["id"], " ", sensor["value"])
         
         # Thực hiện gọi hàm addStationsData từ contract
-        receipt = add_stations_data(data["station_id"], data["gps_longitude"], data["gps_latitude"], sensorIds, sensorValues, sensorUinits)
+        receipt = add_stations_data(data["station_id"], "", "", sensorIds, sensorValues, sensorUinits)
         print("Transaction receipt:", receipt)
         
     except json.JSONDecodeError as e:
