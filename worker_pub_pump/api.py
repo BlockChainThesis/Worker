@@ -3,7 +3,7 @@ import time
 import json
 from flask import Flask, request, jsonify
 from function import setup_mqtt_client, station_data
-from interact_blockchain import update_controller_data, get_controller_value
+from interact_blockchain import update_controller_data
 from flask_cors import CORS
 
 MQTT_TOPIC_PUB = "/innovation/pumpcontroller/station"
@@ -12,53 +12,12 @@ mqttClient.loop_start()
 
 app = Flask(__name__)
 CORS(app)
-
 def publish_data(station_id):
     if station_id not in station_data:
         return {"error": f"No data available for station_id: {station_id}"}
-
     data = station_data[station_id]
-    # data = {
-    #     "station_id": "PUMP_0001",
-    #     "station_name": "He Thong Bom",
-    #     "gps_longitude": 106.89,
-    #     "gps_latitude": 10.5,
-    #     "sensors": [
-    #         {
-    #         "sensor_id": "pump_0001",
-    #         "sensor_name": "Phan khu 1",
-    #         "sensor_value": 0,
-    #         "sensor_unit": ""
-    #         },
-    #         {
-    #         "sensor_id": "pump_0002",
-    #         "sensor_name": "Phan khu 2",
-    #         "sensor_value": 0,
-    #         "sensor_unit": ""
-    #         },
-    #         {
-    #         "sensor_id": "pump_0003",
-    #         "sensor_name": "Phan khu 3",
-    #         "sensor_value": 0,
-    #         "sensor_unit": ""
-    #         },
-    #         {
-    #         "sensor_id": "pump_0004",
-    #         "sensor_name": "Phan khu 4",
-    #         "sensor_value": 0,
-    #         "sensor_unit": ""
-    #         },
-    #         {
-    #         "sensor_id": "pump_0005",
-    #         "sensor_name": "Phan khu 5",
-    #         "sensor_value": 0,
-    #         "sensor_unit": ""
-    #         }
-    #     ]
-    # }
-    
     json_data = json.dumps(data)
-    print(json_data)
+    # print(json_data)
     mqttClient.publish(MQTT_TOPIC_PUB, json_data, retain=True)
 
     return {"success": True, "message": f"Data published for station_id: {station_id}"}
@@ -78,7 +37,7 @@ def turn_on():
             sensor['sensor_value'] = 1  # Turn on the sensor (example value)
             result = publish_data(station_id)
             # add data to blockchain
-            # update_controller_data(station_id, sensor_id, 1)
+            update_controller_data(station_id, sensor_id, 1)
             return jsonify(result), 200
 
     return jsonify({"error": f"Sensor {sensor_id} not found for station {station_id}"}), 404
@@ -98,18 +57,10 @@ def turn_off():
             sensor['sensor_value'] = 0  # Turn off the sensor (example value)
             result = publish_data(station_id)
             # add data to blockchain
-            # receipt = update_controller_data(station_id, sensor_id, 0)
+            receipt = update_controller_data(station_id, sensor_id, 0)
             return jsonify(result), 200
 
     return jsonify({"error": f"Sensor {sensor_id} not found for station {station_id}"}), 404
-
-# @app.route('/get_controller_value', methods=['GET'])
-# def get_controller_value_api():
-#     station_id = request.args.get('station_id')
-#     controller_id = request.args.get('controller_id')
-#     value = get_controller_value(station_id, controller_id)
-#     return jsonify({"controller_value": value}), 200
-
 
 @app.route('/get_controller_value', methods=['GET'])
 def get_controller_value_api():
@@ -129,4 +80,3 @@ def get_controller_value_api():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5006)
 
-# print(publish_data(1))

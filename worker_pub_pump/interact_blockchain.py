@@ -4,6 +4,10 @@ from web3.middleware import geth_poa_middleware
 from eth_account import Account
 import os
 from dotenv import load_dotenv
+import redis
+
+# Connect Redis
+r = redis.Redis(host='localhost', port=6379, db=0)
 
 # Load environment variables from .env file
 load_dotenv()
@@ -53,11 +57,60 @@ def update_controller_data(station_id, controller_id, value):
     receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     return receipt
 
+def update_controller_data_batch(station_ids, controller_ids, values):
+    # Tạo giao dịch nhưng không gửi đi
+    txn_dict = contract.functions.updateControllerValueBatch(station_ids, controller_ids, values).build_transaction({
+        'chainId': 97,
+        'gas': 10000000,
+        'gasPrice': w3.to_wei('5.05', 'gwei'),
+        'nonce': w3.eth.get_transaction_count(account.address),
+    })
+
+    # Ký giao dịch
+    signed_txn = account.sign_transaction(txn_dict)
+    # Gửi giao dịch đã ký đi
+    tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+    # Đợi cho đến khi giao dịch được xác nhận
+    receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    return receipt
+
+# Hàm để thêm giao dịch vào Redis
+def add_transaction_off_chain(station_id, controller_id, value):
+    transaction_count = r.llen('controller_transactions')
+    transaction_data = json.dumps({
+        "stationId": station_id,
+        "controllerId": controller_id,
+        "value": str(value),
+    })
+    if transaction_count < 20:
+        r.rpush('controller_transactions', transaction_data)
+        print(f"Transaction added to Redis. Total transactions: {transaction_count + 1}")
+    else:
+        print("20 transactions reached. Sending to blockchain.")
+        send_transactions_to_blockchain()
+
+# Hàm để gửi các giao dịch từ Redis lên blockchain
+def send_transactions_to_blockchain():
+    transactions = [json.loads(r.lindex('controller_transactions', i)) for i in range(r.llen('controller_transactions'))]
+
+    if transactions:
+        station_ids = [t['stationId'] for t in transactions]
+        controller_ids = [t['controllerId'] for t in transactions]
+        values = [t['value'] for t in transactions]
+
+    receipt = update_controller_data_batch(station_ids, controller_ids, values)
+    # Xóa các giao dịch trong Redis sau khi gửi thành công
+    r.delete('controller_transactions')
+    print(f"Receipt: {receipt}")
+
 def get_controller_value(station_id, controller_id):
     # Gọi hàm getControllerValue từ smart contract
     controller_value = contract.functions.getControllerValue(station_id, controller_id).call()
     return controller_value
 
 
-# re = update_controller_data("VALVE_0001", "valve_0001", 1)
-# print(re)
+# for i in range(21):
+#     station_id = "Station" + str(i)
+#     controller_id = "Controller" + str(i)
+#     value = "Value" + str(i)
+#     add_transaction_off_chain(station_id, controller_id, value)

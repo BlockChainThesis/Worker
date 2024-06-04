@@ -3,7 +3,7 @@ import time
 import json
 from flask import Flask, request, jsonify
 from function import setup_mqtt_client, station_data
-from interact_blockchain import update_controller_data, get_controller_value
+from interact_blockchain import update_controller_data
 from flask_cors import CORS
 
 MQTT_TOPIC_PUB = "/innovation/valvecontroller/station"
@@ -15,34 +15,7 @@ CORS(app)
 def publish_data(station_id):
     if station_id not in station_data:
         return {"error": f"No data available for station_id: {station_id}"}
-
     data = station_data[station_id]
-    # data = {
-    #     "station_id": "VALVE_0001",
-    #     "station_name": "Van dien tu",
-    #     "gps_longitude": 106.89,
-    #     "gps_latitude": 10.5,
-    #     "sensors": [
-    #         {
-    #         "sensor_id": "valve_0001",
-    #         "sensor_name": "Van nuoc 1",
-    #         "sensor_value": 1,
-    #         "sensor_unit": ""
-    #         },
-    #         {
-    #         "sensor_id": "valve_0002",
-    #         "sensor_name": "Van nuoc 2",
-    #         "sensor_value": 0,
-    #         "sensor_unit": ""
-    #         },
-    #         {
-    #         "sensor_id": "valve_0003",
-    #         "sensor_name": "Van nuoc 3",
-    #         "sensor_value": 0,
-    #         "sensor_unit": ""
-    #         }
-    #     ]
-    # }
     json_data = json.dumps(data)
     # print(json_data)
     mqttClient.publish(MQTT_TOPIC_PUB, json_data, retain=True)
@@ -64,7 +37,7 @@ def turn_on():
             sensor['sensor_value'] = 1  # Turn on the sensor (example value)
             result = publish_data(station_id)
             # add data to blockchain
-            # update_controller_data(station_id, sensor_id, 1)
+            update_controller_data(station_id, sensor_id, 1)
             return jsonify(result), 200
 
     return jsonify({"error": f"Sensor {sensor_id} not found for station {station_id}"}), 404
@@ -84,7 +57,7 @@ def turn_off():
             sensor['sensor_value'] = 0  # Turn off the sensor (example value)
             result = publish_data(station_id)
             # add data to blockchain
-            # receipt = update_controller_data(station_id, sensor_id, 0)
+            receipt = update_controller_data(station_id, sensor_id, 0)
             return jsonify(result), 200
 
     return jsonify({"error": f"Sensor {sensor_id} not found for station {station_id}"}), 404
